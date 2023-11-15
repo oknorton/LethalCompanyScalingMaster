@@ -1,4 +1,5 @@
 ﻿using HarmonyLib;
+using LethalCompanyModV2.Component;
 using UnityEngine;
 
 namespace LethalCompanyModV2.Patches;
@@ -11,7 +12,7 @@ public class OnPlayerConnectedClientRpcPatch
     {
         Debug.Log("Starting the patch: Postfix for OnPlayerConnectedClientRpc()");
         
-        Plugin.AutoUpdateOnPlayerJoin();
+        Plugin.OnPlayerJoin();
 
     }
 }

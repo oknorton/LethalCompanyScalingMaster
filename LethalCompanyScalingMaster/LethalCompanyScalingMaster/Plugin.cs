@@ -14,10 +14,10 @@ namespace LethalCompanyModV2
     {
         private static bool _loaded;
         public static int DeadlineAmount;
-        public static float DeathPenalty = 0.2f;
-
+        public static int groupCredits;
+        public static bool updateQuota = false;
         public static bool AutoUpdateQuota = true;
-        
+
         Harmony _harmony;
 
         private void Awake()
@@ -43,14 +43,11 @@ namespace LethalCompanyModV2
             }
         }
 
-        public static void AutoUpdateOnPlayerJoin()
+        public static void OnPlayerJoin()
         {
-            Debug.Log("A player joined, the new player count is: " + NetworkManager.Singleton.ConnectedClients.Count);
             if (AutoUpdateQuota)
             {
-                Debug.Log("Auto Updating Quotas to match the amount of players:  " + NetworkManager.Singleton.ConnectedClients.Count);
-
-                UpdateAndSyncValues();
+                updateQuota = true;
             }
         }
 
@@ -64,14 +61,22 @@ namespace LethalCompanyModV2
             if (!instance.IsServer)
                 return;
 
+            Terminal terminal = FindObjectOfType<Terminal>();
+
+            if (!terminal.IsServer)
+            {
+                Debug.Log("This terminal instance is not a server!!!");
+            }
+            else
+            {
+                Debug.Log("This terminal instance is a server");
+                terminal.SyncGroupCreditsClientRpc(groupCredits, terminal.numberOfItemsInDropship);
+            }
 
             instance.SyncNewProfitQuotaClientRpc(instance.profitQuota, 0,
                 instance.timesFulfilledQuota);
 
             instance.SyncTimeClientRpc(instance.globalTime, (int)(DeadlineAmount * instance.totalTime));
         }
-
-
-    
     }
 }

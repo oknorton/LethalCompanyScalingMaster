@@ -1,5 +1,6 @@
 ﻿using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.PlayerLoop;
 
 namespace LethalCompanyModV2.Component
 {
@@ -29,15 +30,15 @@ namespace LethalCompanyModV2.Component
         private GUIStyle _headerLabelStyle;
         private bool _showSideMenu;
 
-       
-
+        
+        
         public void OnGUI()
         {
             if (_initialized == false)
             {
                 InitStyles();
             }
-
+            
             GUILayout.BeginArea(new Rect(10, 35, 500, 700));
             GUI.Box(new Rect(0, 0, 520, 700), "", _currentStyle);
             
@@ -194,9 +195,9 @@ namespace LethalCompanyModV2.Component
 
             return profitQuota;
         }
+       
 
-
-        private void SaveValues()
+        public void SaveValues()
         {
             Debug.Log("NON parsed values= " + _baseQuota + " + "  + _playerCountQuotaModifier + " X " + NetworkManager.Singleton.ConnectedClients.Count);
 
@@ -222,9 +223,8 @@ namespace LethalCompanyModV2.Component
             }
 
             _tod.quotaVariables.increaseSteepness = _quotaIncreaseSteepness;
-            Plugin.DeathPenalty = _tempDeathPenalty;
-            Terminal objectOfType = Object.FindObjectOfType<Terminal>();
-            objectOfType.groupCredits = _totalStartingCredits;
+            // Plugin.DeathPenalty = _tempDeathPenalty;
+            Plugin.groupCredits= _totalStartingCredits;
             
             Plugin.UpdateAndSyncValues();
         }
