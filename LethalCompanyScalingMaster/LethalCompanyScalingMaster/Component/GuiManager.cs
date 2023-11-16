@@ -1,35 +1,35 @@
 ﻿using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.PlayerLoop;
 
 namespace LethalCompanyModV2.Component
 {
     public class GUIManager
     {
-        private TimeOfDay _tod;
+        public static TimeOfDay _tod;
         private bool _initialized;
 
         //per player values (modded)
-        private string _playerCountQuotaModifier = "10";
-        private string _baseQuota = "120";
+        public static string _playerCountQuotaModifier = "10";
+        public static string _baseQuota = "120";
 
 
         //base values
-        private string _baseIncreaseInput = "80";
-        private float _quotaIncreaseSteepness = 8.5f;
+        public static string _baseIncreaseInput = "80";
+        public static float _quotaIncreaseSteepness = 8.5f;
 
-        private string _daysUntilDeadlineInput = "4";
+        public static string _daysUntilDeadlineInput = "4";
         private bool _enableAutoUpdatedScaling = true;
         private float _tempDeathPenalty = 0.2f;
         private string _perPlayerCredits = "15";
-        private int _totalStartingCredits = 60;
-        
+        public static int _totalStartingCredits = 60;
+
         private GUIStyle _currentStyle;
         private GUIStyle _textFieldStyle;
         private GUIStyle _titleLabelStyle;
         private GUIStyle _headerLabelStyle;
         private bool _showSideMenu;
 
-       
 
         public void OnGUI()
         {
@@ -40,7 +40,7 @@ namespace LethalCompanyModV2.Component
 
             GUILayout.BeginArea(new Rect(10, 35, 500, 700));
             GUI.Box(new Rect(0, 0, 520, 700), "", _currentStyle);
-            
+
             GUILayout.Label("LC - Better Quota Scaler", _headerLabelStyle);
 
             GUILayout.Label("Quota Settings", _titleLabelStyle);
@@ -77,27 +77,30 @@ namespace LethalCompanyModV2.Component
                     GUILayout.Label("(", GUILayout.Width(15));
                     GUILayout.Label(NetworkManager.Singleton.ConnectedClients.Count.ToString(), GUILayout.Width(80));
                     GUILayout.Label("X", GUILayout.Width(15));
-                    _playerCountQuotaModifier = GUILayout.TextField(_playerCountQuotaModifier, _textFieldStyle, GUILayout.Width(125));
+                    _playerCountQuotaModifier =
+                        GUILayout.TextField(_playerCountQuotaModifier, _textFieldStyle, GUILayout.Width(125));
                     GUILayout.Label(")", GUILayout.Width(15));
                 }
                 GUILayout.EndHorizontal();
             }
             GUILayout.EndVertical();
-            if (float.TryParse(_baseQuota, out float baseQuotaParsed) && float.TryParse(_playerCountQuotaModifier, out float playerCountQuotaModifierParsed))
+            if (float.TryParse(_baseQuota, out float baseQuotaParsed) && float.TryParse(_playerCountQuotaModifier,
+                    out float playerCountQuotaModifierParsed))
             {
-                int startingQuota = (int)(baseQuotaParsed + (NetworkManager.Singleton.ConnectedClients.Count * playerCountQuotaModifierParsed));
+                int startingQuota = (int)(baseQuotaParsed +
+                                          (NetworkManager.Singleton.ConnectedClients.Count *
+                                           playerCountQuotaModifierParsed));
                 GUILayout.Label("Starting Profit Quota = " + startingQuota);
             }
 
             GUILayout.Width(400);
-            
+
             GUILayout.Label("Quota increase steepness: " + _quotaIncreaseSteepness);
             _quotaIncreaseSteepness =
                 Mathf.Round(GUILayout.HorizontalSlider(_quotaIncreaseSteepness, 0f, 10f, GUILayout.Width(300)) * 2) / 2;
 
             GUILayout.Label("Quota increase base increase value: " + _tod.quotaVariables.baseIncrease);
             _baseIncreaseInput = GUILayout.TextField(_baseIncreaseInput, _textFieldStyle, GUILayout.Width(300));
-
 
 
             GUILayout.Label("Deadline settings", _titleLabelStyle);
@@ -108,19 +111,18 @@ namespace LethalCompanyModV2.Component
 
             GUILayout.Label("Death Penalty Settings", _titleLabelStyle);
 
-            // Slider for death penalty
-            GUILayout.Label("Per Player Death Penalty: " + _tempDeathPenalty * 100 + "%");
-            _tempDeathPenalty = Mathf.Round(GUILayout.HorizontalSlider(_tempDeathPenalty, 0f, 1f, GUILayout.Width(300)) * 100) /
-                           100;
-            GUILayout.Label("Max percentage of money you can lose with these settings " +
-                            _tempDeathPenalty * 100 * NetworkManager.Singleton.ConnectedClients.Count + "%");
+         
+            GUILayout.Label("Per Player Death Penalty: " + 0.8f / Plugin.GetConnectedPlayers() * 100 + "%");
+
+            GUILayout.Label("Max percentage of money you can lose is 80% ");
+
 
             GUILayout.Label("Credit/Funds settings", _titleLabelStyle);
             GUILayout.Label("Per Player Starting Credits: " + _perPlayerCredits);
             _perPlayerCredits = GUILayout.TextField(_perPlayerCredits, _textFieldStyle, GUILayout.Width(300));
             if (float.TryParse(_perPlayerCredits, out float perPlayerCreditsParsed))
             {
-                 _totalStartingCredits =
+                _totalStartingCredits =
                     (int)(NetworkManager.Singleton.ConnectedClients.Count * perPlayerCreditsParsed);
                 GUILayout.Label("Total Starting credits with these settings " + _totalStartingCredits);
             }
@@ -141,7 +143,7 @@ namespace LethalCompanyModV2.Component
                 GUI.backgroundColor = Color.white;
                 if (GUILayout.Button("Save values", GUILayout.Width(250)))
                 {
-                    SaveValues();
+                    Plugin.SaveValues();
                 }
             }
             GUILayout.EndHorizontal();
@@ -196,41 +198,42 @@ namespace LethalCompanyModV2.Component
         }
 
 
-        private void SaveValues()
-        {
-            Debug.Log("NON parsed values= " + _baseQuota + " + "  + _playerCountQuotaModifier + " X " + NetworkManager.Singleton.ConnectedClients.Count);
+        // public void SaveValues()
+        // {
+        //     Debug.Log("NON parsed values= " + _baseQuota + " + "  + _playerCountQuotaModifier + " X " + NetworkManager.Singleton.ConnectedClients.Count);
+        //
+        //     if (float.TryParse(_baseQuota, out float baseQuotaParsed) && float.TryParse(_playerCountQuotaModifier,
+        //             out float playerCountQuotaModifierParsed))
+        //     {
+        //         Debug.Log("Parsed values= " + baseQuotaParsed + " + "  + playerCountQuotaModifierParsed + " X " + NetworkManager.Singleton.ConnectedClients.Count);
+        //         int startingQuota = (int)(baseQuotaParsed + (NetworkManager.Singleton.ConnectedClients.Count * playerCountQuotaModifierParsed));
+        //
+        //         _tod.quotaVariables.startingQuota = startingQuota;
+        //         _tod.profitQuota = startingQuota;
+        //     }
+        //
+        //     if (float.TryParse(_baseIncreaseInput, out float baseIncrease))
+        //     {
+        //         _tod.quotaVariables.baseIncrease = baseIncrease;
+        //     }
+        //
+        //     if (int.TryParse(_daysUntilDeadlineInput, out int daysUntilDeadline))
+        //     {
+        //         Plugin.DeadlineAmount = daysUntilDeadline;
+        //         _tod.quotaVariables.deadlineDaysAmount = daysUntilDeadline;
+        //     }
+        //
+        //     _tod.quotaVariables.increaseSteepness = _quotaIncreaseSteepness;
+        //     // Plugin.DeathPenalty = _tempDeathPenalty;
+        //     Plugin.groupCredits= _totalStartingCredits;
+        //     Plugin.UpdateAndSyncValues();
+        // }
 
-            if (float.TryParse(_baseQuota, out float baseQuotaParsed) && float.TryParse(_playerCountQuotaModifier,
-                    out float playerCountQuotaModifierParsed))
-            {
-                Debug.Log("Parsed values= " + baseQuotaParsed + " + "  + playerCountQuotaModifierParsed + " X " + NetworkManager.Singleton.ConnectedClients.Count);
-                int startingQuota = (int)(baseQuotaParsed + (NetworkManager.Singleton.ConnectedClients.Count * playerCountQuotaModifierParsed));
 
-                _tod.quotaVariables.startingQuota = startingQuota;
-                _tod.profitQuota = startingQuota;
-            }
-
-            if (float.TryParse(_baseIncreaseInput, out float baseIncrease))
-            {
-                _tod.quotaVariables.baseIncrease = baseIncrease;
-            }
-
-            if (int.TryParse(_daysUntilDeadlineInput, out int daysUntilDeadline))
-            {
-                Plugin.DeadlineAmount = daysUntilDeadline;
-                _tod.quotaVariables.deadlineDaysAmount = daysUntilDeadline;
-            }
-
-            _tod.quotaVariables.increaseSteepness = _quotaIncreaseSteepness;
-            Plugin.DeathPenalty = _tempDeathPenalty;
-            Terminal objectOfType = Object.FindObjectOfType<Terminal>();
-            objectOfType.groupCredits = _totalStartingCredits;
-            
-            Plugin.UpdateAndSyncValues();
-        }
-        private void InitStyles()
+        public void InitStyles()
         {
             _tod = TimeOfDay.Instance;
+
             if (_currentStyle == null)
             {
                 _currentStyle = new GUIStyle(GUI.skin.box);
@@ -249,14 +252,15 @@ namespace LethalCompanyModV2.Component
                 _titleLabelStyle.fontSize = 15;
                 _titleLabelStyle.alignment = TextAnchor.MiddleLeft;
             }
+
             if (_headerLabelStyle == null)
             {
                 _headerLabelStyle = new GUIStyle(GUI.skin.label);
                 _headerLabelStyle.fontSize = 24;
                 _headerLabelStyle.alignment = TextAnchor.MiddleCenter;
             }
-            _initialized = true;
 
+            _initialized = true;
         }
 
         private Texture2D MakeTex(int width, int height, Color col)

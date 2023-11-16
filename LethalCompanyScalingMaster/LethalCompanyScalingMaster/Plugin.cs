@@ -14,10 +14,10 @@ namespace LethalCompanyModV2
     {
         private static bool _loaded;
         public static int DeadlineAmount;
-        public static float DeathPenalty = 0.2f;
-
+        public static int groupCredits;
+        public static bool updateQuota = false;
         public static bool AutoUpdateQuota = true;
-        
+
         Harmony _harmony;
 
         private void Awake()
@@ -43,17 +43,48 @@ namespace LethalCompanyModV2
             }
         }
 
-        public static void AutoUpdateOnPlayerJoin()
+        public static int GetConnectedPlayers()
         {
-            Debug.Log("A player joined, the new player count is: " + NetworkManager.Singleton.ConnectedClients.Count);
+            return StartOfRound.Instance.connectedPlayersAmount + 1;
+        }
+        public static void OnPlayerJoin()
+        {
             if (AutoUpdateQuota)
             {
-                Debug.Log("Auto Updating Quotas to match the amount of players:  " + NetworkManager.Singleton.ConnectedClients.Count);
-
-                UpdateAndSyncValues();
+                SaveValues();
             }
         }
 
+        public static void SaveValues()
+        {
+            Debug.Log("NON parsed values= " + GUIManager._baseQuota + " + "  + GUIManager._playerCountQuotaModifier + " X " + NetworkManager.Singleton.ConnectedClients.Count);
+
+            if (float.TryParse(GUIManager._baseQuota, out float baseQuotaParsed) && float.TryParse(GUIManager._playerCountQuotaModifier,
+                    out float playerCountQuotaModifierParsed))
+            {
+                Debug.Log("Parsed values= " + baseQuotaParsed + " + "  + playerCountQuotaModifierParsed + " X " + NetworkManager.Singleton.ConnectedClients.Count);
+                int startingQuota = (int)(baseQuotaParsed + (NetworkManager.Singleton.ConnectedClients.Count * playerCountQuotaModifierParsed));
+
+                GUIManager._tod.quotaVariables.startingQuota = startingQuota;
+                GUIManager._tod.profitQuota = startingQuota;
+            }
+
+            if (float.TryParse(GUIManager._baseIncreaseInput, out float baseIncrease))
+            {
+                GUIManager. _tod.quotaVariables.baseIncrease = baseIncrease;
+            }
+
+            if (int.TryParse(GUIManager._daysUntilDeadlineInput, out int daysUntilDeadline))
+            {
+                DeadlineAmount = daysUntilDeadline;
+                GUIManager._tod.quotaVariables.deadlineDaysAmount = daysUntilDeadline;
+            }
+
+            GUIManager._tod.quotaVariables.increaseSteepness = GUIManager._quotaIncreaseSteepness;
+            // Plugin.DeathPenalty = _tempDeathPenalty;
+            groupCredits= GUIManager._totalStartingCredits;
+            UpdateAndSyncValues();
+        }
 
         public static void UpdateAndSyncValues()
         {
@@ -64,14 +95,22 @@ namespace LethalCompanyModV2
             if (!instance.IsServer)
                 return;
 
+            Terminal terminal = FindObjectOfType<Terminal>();
+
+            if (!terminal.IsServer)
+            {
+                Debug.Log("This terminal instance is not a server!!!");
+            }
+            else
+            {
+                Debug.Log("This terminal instance is a server");
+                terminal.SyncGroupCreditsClientRpc(groupCredits, terminal.numberOfItemsInDropship);
+            }
 
             instance.SyncNewProfitQuotaClientRpc(instance.profitQuota, 0,
                 instance.timesFulfilledQuota);
 
             instance.SyncTimeClientRpc(instance.globalTime, (int)(DeadlineAmount * instance.totalTime));
         }
-
-
-    
     }
 }
