@@ -43,14 +43,48 @@ namespace LethalCompanyModV2
             }
         }
 
+        public static int GetConnectedPlayers()
+        {
+            return StartOfRound.Instance.connectedPlayersAmount + 1;
+        }
         public static void OnPlayerJoin()
         {
             if (AutoUpdateQuota)
             {
-                updateQuota = true;
+                SaveValues();
             }
         }
 
+        public static void SaveValues()
+        {
+            Debug.Log("NON parsed values= " + GUIManager._baseQuota + " + "  + GUIManager._playerCountQuotaModifier + " X " + NetworkManager.Singleton.ConnectedClients.Count);
+
+            if (float.TryParse(GUIManager._baseQuota, out float baseQuotaParsed) && float.TryParse(GUIManager._playerCountQuotaModifier,
+                    out float playerCountQuotaModifierParsed))
+            {
+                Debug.Log("Parsed values= " + baseQuotaParsed + " + "  + playerCountQuotaModifierParsed + " X " + NetworkManager.Singleton.ConnectedClients.Count);
+                int startingQuota = (int)(baseQuotaParsed + (NetworkManager.Singleton.ConnectedClients.Count * playerCountQuotaModifierParsed));
+
+                GUIManager._tod.quotaVariables.startingQuota = startingQuota;
+                GUIManager._tod.profitQuota = startingQuota;
+            }
+
+            if (float.TryParse(GUIManager._baseIncreaseInput, out float baseIncrease))
+            {
+                GUIManager. _tod.quotaVariables.baseIncrease = baseIncrease;
+            }
+
+            if (int.TryParse(GUIManager._daysUntilDeadlineInput, out int daysUntilDeadline))
+            {
+                DeadlineAmount = daysUntilDeadline;
+                GUIManager._tod.quotaVariables.deadlineDaysAmount = daysUntilDeadline;
+            }
+
+            GUIManager._tod.quotaVariables.increaseSteepness = GUIManager._quotaIncreaseSteepness;
+            // Plugin.DeathPenalty = _tempDeathPenalty;
+            groupCredits= GUIManager._totalStartingCredits;
+            UpdateAndSyncValues();
+        }
 
         public static void UpdateAndSyncValues()
         {

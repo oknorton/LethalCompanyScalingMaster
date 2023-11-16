@@ -6,23 +6,23 @@ namespace LethalCompanyModV2.Component
 {
     public class GUIManager
     {
-        private TimeOfDay _tod;
+        public static TimeOfDay _tod;
         private bool _initialized;
 
         //per player values (modded)
-        private string _playerCountQuotaModifier = "10";
-        private string _baseQuota = "120";
+        public static string _playerCountQuotaModifier = "10";
+        public static string _baseQuota = "120";
 
 
         //base values
-        private string _baseIncreaseInput = "80";
-        private float _quotaIncreaseSteepness = 8.5f;
+        public static string _baseIncreaseInput = "80";
+        public static float _quotaIncreaseSteepness = 8.5f;
 
-        private string _daysUntilDeadlineInput = "4";
+        public static string _daysUntilDeadlineInput = "4";
         private bool _enableAutoUpdatedScaling = true;
         private float _tempDeathPenalty = 0.2f;
         private string _perPlayerCredits = "15";
-        private int _totalStartingCredits = 60;
+        public static int _totalStartingCredits = 60;
         
         private GUIStyle _currentStyle;
         private GUIStyle _textFieldStyle;
@@ -142,7 +142,7 @@ namespace LethalCompanyModV2.Component
                 GUI.backgroundColor = Color.white;
                 if (GUILayout.Button("Save values", GUILayout.Width(250)))
                 {
-                    SaveValues();
+                    Plugin.SaveValues();
                 }
             }
             GUILayout.EndHorizontal();
@@ -195,42 +195,44 @@ namespace LethalCompanyModV2.Component
 
             return profitQuota;
         }
+
+
+        // public void SaveValues()
+        // {
+        //     Debug.Log("NON parsed values= " + _baseQuota + " + "  + _playerCountQuotaModifier + " X " + NetworkManager.Singleton.ConnectedClients.Count);
+        //
+        //     if (float.TryParse(_baseQuota, out float baseQuotaParsed) && float.TryParse(_playerCountQuotaModifier,
+        //             out float playerCountQuotaModifierParsed))
+        //     {
+        //         Debug.Log("Parsed values= " + baseQuotaParsed + " + "  + playerCountQuotaModifierParsed + " X " + NetworkManager.Singleton.ConnectedClients.Count);
+        //         int startingQuota = (int)(baseQuotaParsed + (NetworkManager.Singleton.ConnectedClients.Count * playerCountQuotaModifierParsed));
+        //
+        //         _tod.quotaVariables.startingQuota = startingQuota;
+        //         _tod.profitQuota = startingQuota;
+        //     }
+        //
+        //     if (float.TryParse(_baseIncreaseInput, out float baseIncrease))
+        //     {
+        //         _tod.quotaVariables.baseIncrease = baseIncrease;
+        //     }
+        //
+        //     if (int.TryParse(_daysUntilDeadlineInput, out int daysUntilDeadline))
+        //     {
+        //         Plugin.DeadlineAmount = daysUntilDeadline;
+        //         _tod.quotaVariables.deadlineDaysAmount = daysUntilDeadline;
+        //     }
+        //
+        //     _tod.quotaVariables.increaseSteepness = _quotaIncreaseSteepness;
+        //     // Plugin.DeathPenalty = _tempDeathPenalty;
+        //     Plugin.groupCredits= _totalStartingCredits;
+        //     Plugin.UpdateAndSyncValues();
+        // }
+
        
-
-        public void SaveValues()
-        {
-            Debug.Log("NON parsed values= " + _baseQuota + " + "  + _playerCountQuotaModifier + " X " + NetworkManager.Singleton.ConnectedClients.Count);
-
-            if (float.TryParse(_baseQuota, out float baseQuotaParsed) && float.TryParse(_playerCountQuotaModifier,
-                    out float playerCountQuotaModifierParsed))
-            {
-                Debug.Log("Parsed values= " + baseQuotaParsed + " + "  + playerCountQuotaModifierParsed + " X " + NetworkManager.Singleton.ConnectedClients.Count);
-                int startingQuota = (int)(baseQuotaParsed + (NetworkManager.Singleton.ConnectedClients.Count * playerCountQuotaModifierParsed));
-
-                _tod.quotaVariables.startingQuota = startingQuota;
-                _tod.profitQuota = startingQuota;
-            }
-
-            if (float.TryParse(_baseIncreaseInput, out float baseIncrease))
-            {
-                _tod.quotaVariables.baseIncrease = baseIncrease;
-            }
-
-            if (int.TryParse(_daysUntilDeadlineInput, out int daysUntilDeadline))
-            {
-                Plugin.DeadlineAmount = daysUntilDeadline;
-                _tod.quotaVariables.deadlineDaysAmount = daysUntilDeadline;
-            }
-
-            _tod.quotaVariables.increaseSteepness = _quotaIncreaseSteepness;
-            // Plugin.DeathPenalty = _tempDeathPenalty;
-            Plugin.groupCredits= _totalStartingCredits;
-            
-            Plugin.UpdateAndSyncValues();
-        }
-        private void InitStyles()
+        public void InitStyles()
         {
             _tod = TimeOfDay.Instance;
+
             if (_currentStyle == null)
             {
                 _currentStyle = new GUIStyle(GUI.skin.box);
