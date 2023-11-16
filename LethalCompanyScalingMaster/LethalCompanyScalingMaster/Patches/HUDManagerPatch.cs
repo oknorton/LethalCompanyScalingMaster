@@ -11,7 +11,7 @@ namespace LethalCompanyModV2.Patches
     {
         static bool Prefix(ref int playersDead, ref int bodiesInsured)
         {
-            float newDeathPenaltyPercentage = (float)(0.8f / StartOfRound.Instance.connectedPlayersAmount);
+            float newDeathPenaltyPercentage = (float)(0.8f / Plugin.GetConnectedPlayers());
 
 
             float num = newDeathPenaltyPercentage;

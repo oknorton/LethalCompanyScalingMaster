@@ -22,9 +22,9 @@ public class ControlManager : MonoBehaviour
         {
             if (StartOfRound.Instance != null)
             {
-                Debug.Log("Playercount: " + StartOfRound.Instance.connectedPlayersAmount);
+                Debug.Log("Playercount: " + Plugin.GetConnectedPlayers());
             }
-            if (!isInitialized && StartOfRound.Instance != null && (StartOfRound.Instance.connectedPlayersAmount + 1 == 1))
+            if (!isInitialized && StartOfRound.Instance != null && (Plugin.GetConnectedPlayers() == 1))
             {
                 InitializeFunctions();
                 isInitialized = true;
@@ -32,11 +32,11 @@ public class ControlManager : MonoBehaviour
            
         }
 
-        if (Keyboard.current.leftBracketKey.wasPressedThisFrame)
-        {
-            Plugin.OnPlayerJoin();
-        }
-        else if (Keyboard.current.ctrlKey.isPressed && Keyboard.current.mKey.wasPressedThisFrame)
+        // if (Keyboard.current.leftBracketKey.wasPressedThisFrame && NetworkManager.Singleton.IsHost)
+        // {
+        //     Plugin.OnPlayerJoin();
+        // }
+        else if (Keyboard.current.ctrlKey.isPressed && Keyboard.current.mKey.wasPressedThisFrame && NetworkManager.Singleton.IsHost)
         {
             Debug.Log("Ctrl key held down and 'm' key pressed - Triggering Method2");
             ToggleMenu();
