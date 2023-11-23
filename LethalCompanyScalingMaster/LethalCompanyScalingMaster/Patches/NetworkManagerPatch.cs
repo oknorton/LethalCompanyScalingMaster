@@ -19,4 +19,5 @@ public static class NetworkManagerPatch
             Debug.Log("Ignoring isServer check requirement and retrieving the value either way." + __result.Count);
         }
     }
+
 }

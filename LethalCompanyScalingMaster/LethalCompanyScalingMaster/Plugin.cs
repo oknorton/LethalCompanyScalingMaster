@@ -1,13 +1,10 @@
 ﻿using BepInEx;
 using HarmonyLib;
 using LethalCompanyModV2.Component;
-using LethalCompanyScalingMaster;
-using Unity.Netcode;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
-using PluginInfo = LethalCompanyScalingMaster.PluginInfo;
 
-namespace LethalCompanyModV2
+namespace LethalCompanyScalingMaster
 {
     [BepInPlugin(PluginInfo.PLUGIN_GUID, PluginInfo.PLUGIN_NAME, PluginInfo.PLUGIN_VERSION)]
     public class Plugin : BaseUnityPlugin
@@ -17,6 +14,7 @@ namespace LethalCompanyModV2
         public static int groupCredits;
         public static bool updateQuota = false;
         public static bool AutoUpdateQuota = true;
+        public static bool Host { get; set; }
 
         Harmony _harmony;
 
@@ -57,13 +55,13 @@ namespace LethalCompanyModV2
 
         public static void SaveValues()
         {
-            Debug.Log("NON parsed values= " + GUIManager._baseQuota + " + "  + GUIManager._playerCountQuotaModifier + " X " + NetworkManager.Singleton.ConnectedClients.Count);
+            Debug.Log("NON parsed values= " + GUIManager._baseQuota + " + "  + GUIManager._playerCountQuotaModifier + " X " + GetConnectedPlayers());
 
             if (float.TryParse(GUIManager._baseQuota, out float baseQuotaParsed) && float.TryParse(GUIManager._playerCountQuotaModifier,
                     out float playerCountQuotaModifierParsed))
             {
-                Debug.Log("Parsed values= " + baseQuotaParsed + " + "  + playerCountQuotaModifierParsed + " X " + NetworkManager.Singleton.ConnectedClients.Count);
-                int startingQuota = (int)(baseQuotaParsed + (NetworkManager.Singleton.ConnectedClients.Count * playerCountQuotaModifierParsed));
+                Debug.Log("Parsed values= " + baseQuotaParsed + " + "  + playerCountQuotaModifierParsed + " X " + GetConnectedPlayers());
+                int startingQuota = (int)(baseQuotaParsed + (GetConnectedPlayers() * playerCountQuotaModifierParsed));
 
                 GUIManager._tod.quotaVariables.startingQuota = startingQuota;
                 GUIManager._tod.profitQuota = startingQuota;
@@ -90,7 +88,7 @@ namespace LethalCompanyModV2
         {
             var instance = TimeOfDay.Instance;
 
-            Debug.Log("Updating Profit Quota's " + NetworkManager.Singleton.ConnectedClients.Count);
+            Debug.Log("Updating Profit Quota's " + GetConnectedPlayers());
 
             if (!instance.IsServer)
                 return;

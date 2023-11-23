@@ -1,4 +1,5 @@
-﻿using Unity.Netcode;
+﻿using LethalCompanyScalingMaster;
+using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.PlayerLoop;
 
@@ -20,7 +21,6 @@ namespace LethalCompanyModV2.Component
 
         public static string _daysUntilDeadlineInput = "4";
         private bool _enableAutoUpdatedScaling = true;
-        private float _tempDeathPenalty = 0.2f;
         private string _perPlayerCredits = "15";
         public static int _totalStartingCredits = 60;
 

@@ -1,9 +1,8 @@
 ﻿using HarmonyLib;
-using LethalCompanyModV2.Component;
-using Unity.Netcode;
+using LethalCompanyModV2;
 using UnityEngine;
 
-namespace LethalCompanyModV2.Patches
+namespace LethalCompanyScalingMaster.Patches
 {
     [HarmonyPatch(typeof(HUDManager))]
     [HarmonyPatch("ApplyPenalty")]
