@@ -24,7 +24,7 @@ namespace LethalCompanyScalingMaster
             Logger.LogInfo($"Plugin {PluginInfo.PLUGIN_GUID} is starting up...");
             _harmony = new Harmony(PluginInfo.PLUGIN_GUID);
             _harmony.PatchAll();
-            Logger.LogInfo($"Plugin {PluginInfo.PLUGIN_GUID} has loaded!!");
+            Logger.LogInfo($"Plugin {PluginInfo.PLUGIN_GUID} has loaded!");
         }
 
         private void OnDestroy()

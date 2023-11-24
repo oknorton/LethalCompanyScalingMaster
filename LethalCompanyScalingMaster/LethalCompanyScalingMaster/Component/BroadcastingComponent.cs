@@ -50,16 +50,14 @@ namespace LethalCompanyScalingMaster.Component
         {
             if (signature.Equals("death_penalty"))
             {
-                Debug.Log("(BroadcastingComponent.cs) Signature matched!");
+                Debug.Log("(BroadcastingComponent.cs) Got an int for (" + signature + ") with data: " + data);
+                UpdateDeathPenalty(data);
             }
-            Debug.Log("(BroadcastingComponent.cs) Got an int for (" + signature + ") with data: " + data);
-            UpdateDeathPenalty(data);
+           
         }
 
         private void UpdateDeathPenalty(int deathPenalty)
         {
-            Debug.Log("(BroadcastingComponent.cs)Updating the death penalty - Old gui value: " + Plugin.DeathPenalty + "new Value: " + deathPenalty);
-            Debug.Log("(BroadcastingComponent.cs)Updating the death penalty - Old plug value: " + GUIManager._deathPenalty + "new Value: " + deathPenalty);
             Plugin.DeathPenalty = deathPenalty;
             GUIManager._deathPenalty = deathPenalty;
         }
