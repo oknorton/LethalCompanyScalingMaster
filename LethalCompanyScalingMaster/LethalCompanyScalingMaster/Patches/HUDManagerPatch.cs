@@ -1,9 +1,8 @@
 ﻿using HarmonyLib;
-using LethalCompanyModV2.Component;
-using Unity.Netcode;
+using LethalCompanyModV2;
 using UnityEngine;
 
-namespace LethalCompanyModV2.Patches
+namespace LethalCompanyScalingMaster.Patches
 {
     [HarmonyPatch(typeof(HUDManager))]
     [HarmonyPatch("ApplyPenalty")]
@@ -11,7 +10,7 @@ namespace LethalCompanyModV2.Patches
     {
         static bool Prefix(ref int playersDead, ref int bodiesInsured)
         {
-            float newDeathPenaltyPercentage = (float)(0.8f / Plugin.GetConnectedPlayers());
+            float newDeathPenaltyPercentage = (float)Plugin.DeathPenalty/100;
 
 
             float num = newDeathPenaltyPercentage;

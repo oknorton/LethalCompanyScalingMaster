@@ -1,13 +1,11 @@
 ﻿using BepInEx;
 using HarmonyLib;
 using LethalCompanyModV2.Component;
-using LethalCompanyScalingMaster;
-using Unity.Netcode;
+using LethalCompanyScalingMaster.Component;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
-using PluginInfo = LethalCompanyScalingMaster.PluginInfo;
 
-namespace LethalCompanyModV2
+namespace LethalCompanyScalingMaster
 {
     [BepInPlugin(PluginInfo.PLUGIN_GUID, PluginInfo.PLUGIN_NAME, PluginInfo.PLUGIN_VERSION)]
     public class Plugin : BaseUnityPlugin
@@ -15,8 +13,9 @@ namespace LethalCompanyModV2
         private static bool _loaded;
         public static int DeadlineAmount;
         public static int groupCredits;
-        public static bool updateQuota = false;
         public static bool AutoUpdateQuota = true;
+        public static bool Host { get; set; }
+        public static int DeathPenalty { get; set; }
 
         Harmony _harmony;
 
@@ -25,17 +24,18 @@ namespace LethalCompanyModV2
             Logger.LogInfo($"Plugin {PluginInfo.PLUGIN_GUID} is starting up...");
             _harmony = new Harmony(PluginInfo.PLUGIN_GUID);
             _harmony.PatchAll();
-            Logger.LogInfo($"Plugin {PluginInfo.PLUGIN_GUID} has loaded!!");
+            Logger.LogInfo($"Plugin {PluginInfo.PLUGIN_GUID} has loaded!");
         }
-
 
         private void OnDestroy()
         {
             if (!_loaded)
             {
-                GameObject gameObject = new GameObject("ControlManager");
+                //default death penalty value
+                GameObject gameObject = new GameObject("DontDestroy");
                 DontDestroyOnLoad(gameObject);
                 gameObject.AddComponent<ControlManager>();
+                gameObject.AddComponent<BroadcastingComponent>();
 
 
                 LC_API.ServerAPI.ModdedServer.SetServerModdedOnly();
@@ -47,6 +47,7 @@ namespace LethalCompanyModV2
         {
             return StartOfRound.Instance.connectedPlayersAmount + 1;
         }
+
         public static void OnPlayerJoin()
         {
             if (AutoUpdateQuota)
@@ -57,13 +58,11 @@ namespace LethalCompanyModV2
 
         public static void SaveValues()
         {
-            Debug.Log("NON parsed values= " + GUIManager._baseQuota + " + "  + GUIManager._playerCountQuotaModifier + " X " + NetworkManager.Singleton.ConnectedClients.Count);
-
-            if (float.TryParse(GUIManager._baseQuota, out float baseQuotaParsed) && float.TryParse(GUIManager._playerCountQuotaModifier,
+            if (float.TryParse(GUIManager._baseQuota, out float baseQuotaParsed) && float.TryParse(
+                    GUIManager._playerCountQuotaModifier,
                     out float playerCountQuotaModifierParsed))
             {
-                Debug.Log("Parsed values= " + baseQuotaParsed + " + "  + playerCountQuotaModifierParsed + " X " + NetworkManager.Singleton.ConnectedClients.Count);
-                int startingQuota = (int)(baseQuotaParsed + (NetworkManager.Singleton.ConnectedClients.Count * playerCountQuotaModifierParsed));
+                int startingQuota = (int)(baseQuotaParsed + (GetConnectedPlayers() * playerCountQuotaModifierParsed));
 
                 GUIManager._tod.quotaVariables.startingQuota = startingQuota;
                 GUIManager._tod.profitQuota = startingQuota;
@@ -71,7 +70,7 @@ namespace LethalCompanyModV2
 
             if (float.TryParse(GUIManager._baseIncreaseInput, out float baseIncrease))
             {
-                GUIManager. _tod.quotaVariables.baseIncrease = baseIncrease;
+                GUIManager._tod.quotaVariables.baseIncrease = baseIncrease;
             }
 
             if (int.TryParse(GUIManager._daysUntilDeadlineInput, out int daysUntilDeadline))
@@ -82,7 +81,11 @@ namespace LethalCompanyModV2
 
             GUIManager._tod.quotaVariables.increaseSteepness = GUIManager._quotaIncreaseSteepness;
             // Plugin.DeathPenalty = _tempDeathPenalty;
-            groupCredits= GUIManager._totalStartingCredits;
+            groupCredits = GUIManager._totalStartingCredits;
+
+            DeathPenalty = GUIManager._deathPenalty;
+
+            BroadcastingComponent.BroadcastDeathPenalty(DeathPenalty);
             UpdateAndSyncValues();
         }
 
@@ -90,7 +93,7 @@ namespace LethalCompanyModV2
         {
             var instance = TimeOfDay.Instance;
 
-            Debug.Log("Updating Profit Quota's " + NetworkManager.Singleton.ConnectedClients.Count);
+            Debug.Log("Updating Profit Quota's " + GetConnectedPlayers());
 
             if (!instance.IsServer)
                 return;

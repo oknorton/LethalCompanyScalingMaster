@@ -1,4 +1,5 @@
-﻿using Unity.Netcode;
+﻿using LethalCompanyScalingMaster;
+using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -31,21 +32,24 @@ public class ControlManager : MonoBehaviour
             }
            
         }
-
-        // if (Keyboard.current.leftBracketKey.wasPressedThisFrame && NetworkManager.Singleton.IsHost)
-        // {
-        //     Plugin.OnPlayerJoin();
-        // }
-        else if (Keyboard.current.ctrlKey.isPressed && Keyboard.current.mKey.wasPressedThisFrame && NetworkManager.Singleton.IsHost)
+        
+        if (Keyboard.current.ctrlKey.isPressed && Keyboard.current.mKey.wasPressedThisFrame && Plugin.Host)
         {
             Debug.Log("Ctrl key held down and 'm' key pressed - Triggering Method2");
+            Debug.Log("Plugin Host: " + Plugin.Host);
+            ToggleMenu();
+        }
+        if (Keyboard.current.ctrlKey.isPressed && Keyboard.current.oKey.wasPressedThisFrame && !Plugin.Host)
+        {
+            Debug.Log("Ctrl key held down and 'm' key pressed - Triggering Method2");
+            Debug.Log("Plugin Host: " + Plugin.Host);
             ToggleMenu();
         }
     }
 
     private void InitializeFunctions()
     {
-        _isMenuOpen = true;
+        _isMenuOpen = false;
     }
 
     private void ToggleMenu()
