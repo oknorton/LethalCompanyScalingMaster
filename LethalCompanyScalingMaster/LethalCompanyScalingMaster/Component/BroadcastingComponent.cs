@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using LC_API.ServerAPI;
 using LethalCompanyModV2.Component;
 using UnityEngine;
@@ -24,37 +25,43 @@ namespace LethalCompanyScalingMaster.Component
             }
         }
 
-        public static void BroadcastDeathPenalty()
+        public static void BroadcastDeathPenalty(int penalty)
         {
-            Debug.Log("(BroadcastingComponent.cs)Broadcasting new value!");
-            Networking.Broadcast(0.33f, "death_penalty");
+            Debug.Log("(BroadcastingComponent.cs) Broadcasting new dp value: " + penalty);
+            
+            Networking.Broadcast(penalty, "death_penalty");
         }
 
         private void OnEnable()
         {
             Debug.Log("(BroadcastingComponent.cs)Broadcasting: Subscribed");
-            Networking.GetFloat += OnGotFloat;
+            Networking.GetInt += OnGotInt;
 
         }
 
         private void OnDisable()
         {
             Debug.Log("(BroadcastingComponent.cs)Broadcasting: Unsubscribed");
-            Networking.GetFloat -= OnGotFloat;
+            Networking.GetInt -= OnGotInt;
 
         }
 
-        private void OnGotFloat(float data, string signature)
+        private void OnGotInt(int data, string signature)
         {
-            Debug.Log("(BroadcastingComponent.cs)Got a float for (" + signature + ") with data: " + data);
+            if (signature.Equals("death_penalty"))
+            {
+                Debug.Log("(BroadcastingComponent.cs) Signature matched!");
+            }
+            Debug.Log("(BroadcastingComponent.cs) Got an int for (" + signature + ") with data: " + data);
             UpdateDeathPenalty(data);
         }
 
-        private void UpdateDeathPenalty(float deathPenalty)
+        private void UpdateDeathPenalty(int deathPenalty)
         {
-            Debug.Log("(BroadcastingComponent.cs)Updating the death penalty - Old value: " + Plugin.DeathPenalty +
-                      "new Value: " + deathPenalty);
+            Debug.Log("(BroadcastingComponent.cs)Updating the death penalty - Old gui value: " + Plugin.DeathPenalty + "new Value: " + deathPenalty);
+            Debug.Log("(BroadcastingComponent.cs)Updating the death penalty - Old plug value: " + GUIManager._deathPenalty + "new Value: " + deathPenalty);
             Plugin.DeathPenalty = deathPenalty;
+            GUIManager._deathPenalty = deathPenalty;
         }
         
         private void Awake()

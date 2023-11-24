@@ -10,7 +10,7 @@ namespace LethalCompanyScalingMaster.Patches
     {
         static bool Prefix(ref int playersDead, ref int bodiesInsured)
         {
-            float newDeathPenaltyPercentage = Plugin.DeathPenalty;
+            float newDeathPenaltyPercentage = (float)Plugin.DeathPenalty/100;
 
 
             float num = newDeathPenaltyPercentage;

@@ -15,7 +15,7 @@ namespace LethalCompanyScalingMaster
         public static int groupCredits;
         public static bool AutoUpdateQuota = true;
         public static bool Host { get; set; }
-        public static float DeathPenalty { get; set; }
+        public static int DeathPenalty { get; set; }
 
         Harmony _harmony;
 
@@ -85,7 +85,7 @@ namespace LethalCompanyScalingMaster
 
             DeathPenalty = GUIManager._deathPenalty;
 
-            BroadcastingComponent.BroadcastDeathPenalty();
+            BroadcastingComponent.BroadcastDeathPenalty(DeathPenalty);
             UpdateAndSyncValues();
         }
 

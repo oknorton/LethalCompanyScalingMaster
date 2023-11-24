@@ -19,7 +19,7 @@ namespace LethalCompanyModV2.Component
         //base values
         public static string _baseIncreaseInput = "80";
         public static float _quotaIncreaseSteepness = 8.5f;
-        public static float _deathPenalty = 0.2f;
+        public static int _deathPenalty = 20;
 
         public static string _daysUntilDeadlineInput = "4";
         private bool _enableAutoUpdatedScaling = true;
@@ -115,14 +115,15 @@ namespace LethalCompanyModV2.Component
 
 
             GUILayout.Label("Death Penalty Settings", _titleLabelStyle);
-            _deathPenalty = GUILayout.HorizontalSlider(_deathPenalty, 0f, 1f, GUILayout.Width(300));
-            GUILayout.Label("Death Penalty: " + (_deathPenalty * 100).ToString("0.00") + "%");
+            float deathPenaltySlider = GUILayout.HorizontalSlider(_deathPenalty / 100.0f, 0f, 1f, GUILayout.Width(300));
+            _deathPenalty = Mathf.RoundToInt(deathPenaltySlider * 100);
+            var _deathPenaltyDisplay = _deathPenalty.ToString() + "%";
+            GUILayout.Label("Death Penalty: " + _deathPenaltyDisplay);
 
 
-            GUILayout.Label("Per Player Death Penalty: " + _deathPenalty * 100 + "%");
+            GUILayout.Label("Per Player Death Penalty: " +_deathPenaltyDisplay);
 
-            GUILayout.Label("Max percentage of money you can lose is " + _deathPenalty * Plugin.GetConnectedPlayers() +
-                            "%");
+            GUILayout.Label("Max percentage of money you can lose is " + ((_deathPenalty) * Plugin.GetConnectedPlayers()).ToString("0.00") + "%");
 
 
             GUILayout.Label("Credit/Funds settings", _titleLabelStyle);
@@ -182,9 +183,21 @@ namespace LethalCompanyModV2.Component
 
         private string FilterNumericInput(string input)
         {
+            if (string.IsNullOrWhiteSpace(input))
+            {
+                return "0";
+            }
+
             string filteredInput = new string(input.Where(c => char.IsDigit(c) || c == '.').ToArray());
+
+            if (string.IsNullOrWhiteSpace(filteredInput))
+            {
+                return "0";
+            }
+
             return filteredInput;
         }
+
 
         private int CalculateQuotaForRound(int round)
         {
@@ -215,8 +228,8 @@ namespace LethalCompanyModV2.Component
         public void Init()
         {
             _tod = TimeOfDay.Instance;
-            Plugin.DeathPenalty = 0.8f / Plugin.GetConnectedPlayers();
-            _deathPenalty = 0.8f / Plugin.GetConnectedPlayers();
+            Plugin.DeathPenalty = 80 / Plugin.GetConnectedPlayers();
+            _deathPenalty = 80 / Plugin.GetConnectedPlayers();
             if (_currentStyle == null)
             {
                 _currentStyle = new GUIStyle(GUI.skin.box);
