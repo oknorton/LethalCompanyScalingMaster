@@ -40,10 +40,11 @@ namespace LethalCompanyModV2.Component
                 Init();
             }
 
-            GUILayout.BeginArea(new Rect(10, 35, 500, 700));
-            GUI.Box(new Rect(0, 0, 520, 700), "", _currentStyle);
+            GUILayout.BeginArea(new Rect(10, 35, 500, 600));
+            GUI.Box(new Rect(0, 0, 520, 600), "", _currentStyle);
 
             GUILayout.Label("LC - Better Quota Scaler", _headerLabelStyle);
+            GUILayout.Label("(CTRL + M TO TOGGLE)");
 
             GUILayout.Label("Quota Settings", _titleLabelStyle);
 

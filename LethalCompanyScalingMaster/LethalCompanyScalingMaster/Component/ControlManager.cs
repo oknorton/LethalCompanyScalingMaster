@@ -1,4 +1,5 @@
-﻿using LethalCompanyScalingMaster;
+﻿using GameNetcodeStuff;
+using LethalCompanyScalingMaster;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -21,13 +22,11 @@ public class ControlManager : MonoBehaviour
     {
         if (!isInitialized)
         {
-            if (StartOfRound.Instance != null)
+            if (!isInitialized && StartOfRound.Instance != null && (Plugin.GetConnectedPlayers() == 1) &&
+                StartOfRound.Instance.fullyLoadedPlayers.Count > 0)
             {
-                Debug.Log("Playercount: " + Plugin.GetConnectedPlayers());
-            }
-            if (!isInitialized && StartOfRound.Instance != null && (Plugin.GetConnectedPlayers() == 1))
-            {
-                InitializeFunctions();
+                Debug.Log("Fully loaded players count: " + StartOfRound.Instance.fullyLoadedPlayers.Count);
+                Invoke("InitializeFunctions", 2f); 
                 isInitialized = true;
             }
            
@@ -39,21 +38,21 @@ public class ControlManager : MonoBehaviour
             Debug.Log("Plugin Host: " + Plugin.Host);
             ToggleMenu();
         }
-        if (Keyboard.current.ctrlKey.isPressed && Keyboard.current.oKey.wasPressedThisFrame && !Plugin.Host)
-        {
-            Debug.Log("Ctrl key held down and 'm' key pressed - Triggering Method2");
-            Debug.Log("Plugin Host: " + Plugin.Host);
-            ToggleMenu();
-        }
+      
     }
 
     private void InitializeFunctions()
     {
-        _isMenuOpen = false;
+       ToggleMenu();
     }
+
 
     private void ToggleMenu()
     {
+        if (!Plugin.Host)
+        {
+            return;
+        }
         _isMenuOpen = !_isMenuOpen;
 
         if (_isMenuOpen)

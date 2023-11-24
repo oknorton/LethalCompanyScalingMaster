@@ -31,7 +31,6 @@ namespace LethalCompanyScalingMaster
         {
             if (!_loaded)
             {
-                //default death penalty value
                 GameObject gameObject = new GameObject("DontDestroy");
                 DontDestroyOnLoad(gameObject);
                 gameObject.AddComponent<ControlManager>();
