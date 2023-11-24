@@ -50,4 +50,7 @@
             <HintPath>..\..\..\..\Lethal Company V2\Lethal Company\Lethal Company\Lethal Company_Data\Managed\UnityEngine.InputModule.dll</HintPath>
         </Reference>
     </ItemGroup>
+    <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+        <Exec Command="copy /Y &quot;$(TargetDir)$(TargetFileName)&quot; &quot;E:\SteamLibrary\steamapps\common\Lethal Company\BepInEx\plugins\&quot;" />
+    </Target>
 </Project>

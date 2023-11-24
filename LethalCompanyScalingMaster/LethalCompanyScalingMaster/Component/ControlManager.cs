@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿using LethalCompanyScalingMaster;
+using Unity.Netcode;
+using UnityEngine;
 using UnityEngine.InputSystem;
 
 namespace LethalCompanyModV2.Component;
@@ -7,6 +9,7 @@ public class ControlManager : MonoBehaviour
 {
     private bool _isMenuOpen;
     private GUIManager _guiManager;
+    private bool isInitialized;
 
     public void Awake()
     {
@@ -16,24 +19,37 @@ public class ControlManager : MonoBehaviour
 
     public void Update()
     {
-        if (Keyboard.current.leftBracketKey.wasPressedThisFrame)
+        if (!isInitialized)
         {
-            Debug.Log("[ key pressed - Triggering Method2");
-            Debug.Log("Days until deadline value = " + TimeOfDay.Instance.daysUntilDeadline);
-            Debug.Log("Time until deadline value = " + TimeOfDay.Instance.timeUntilDeadline);
-            Debug.Log("Total time = " + TimeOfDay.Instance.totalTime);
-            Debug.Log("Length of hours = " + TimeOfDay.Instance.lengthOfHours);
+            if (StartOfRound.Instance != null)
+            {
+                Debug.Log("Playercount: " + Plugin.GetConnectedPlayers());
+            }
+            if (!isInitialized && StartOfRound.Instance != null && (Plugin.GetConnectedPlayers() == 1))
+            {
+                InitializeFunctions();
+                isInitialized = true;
+            }
+           
         }
-        else if (Keyboard.current.mKey.wasPressedThisFrame)
+        
+        if (Keyboard.current.ctrlKey.isPressed && Keyboard.current.mKey.wasPressedThisFrame && Plugin.Host)
         {
-            Debug.Log("m key pressed - Triggering Method2");
+            Debug.Log("Ctrl key held down and 'm' key pressed - Triggering Method2");
+            Debug.Log("Plugin Host: " + Plugin.Host);
             ToggleMenu();
         }
-        else if (Keyboard.current.iKey.wasPressedThisFrame)
+        if (Keyboard.current.ctrlKey.isPressed && Keyboard.current.oKey.wasPressedThisFrame && !Plugin.Host)
         {
-            Debug.Log("i key pressed - Triggering Method2");
-            TimeOfDay.Instance.SetNewProfitQuota();
+            Debug.Log("Ctrl key held down and 'm' key pressed - Triggering Method2");
+            Debug.Log("Plugin Host: " + Plugin.Host);
+            ToggleMenu();
         }
+    }
+
+    private void InitializeFunctions()
+    {
+        _isMenuOpen = false;
     }
 
     private void ToggleMenu()
