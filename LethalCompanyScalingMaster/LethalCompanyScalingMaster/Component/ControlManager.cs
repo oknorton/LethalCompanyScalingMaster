@@ -39,6 +39,12 @@ public class ControlManager : MonoBehaviour
             Debug.Log("Plugin Host: " + Plugin.Host);
             ToggleMenu();
         }
+        if (Keyboard.current.ctrlKey.isPressed && Keyboard.current.oKey.wasPressedThisFrame && !Plugin.Host)
+        {
+            Debug.Log("Ctrl key held down and 'm' key pressed - Triggering Method2");
+            Debug.Log("Plugin Host: " + Plugin.Host);
+            ToggleMenu();
+        }
     }
 
     private void InitializeFunctions()

@@ -1,6 +1,7 @@
 ﻿using BepInEx;
 using HarmonyLib;
 using LethalCompanyModV2.Component;
+using LethalCompanyScalingMaster.Component;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
 
@@ -12,9 +13,9 @@ namespace LethalCompanyScalingMaster
         private static bool _loaded;
         public static int DeadlineAmount;
         public static int groupCredits;
-        public static bool updateQuota = false;
         public static bool AutoUpdateQuota = true;
         public static bool Host { get; set; }
+        public static float DeathPenalty { get; set; }
 
         Harmony _harmony;
 
@@ -26,14 +27,15 @@ namespace LethalCompanyScalingMaster
             Logger.LogInfo($"Plugin {PluginInfo.PLUGIN_GUID} has loaded!!");
         }
 
-
         private void OnDestroy()
         {
             if (!_loaded)
             {
-                GameObject gameObject = new GameObject("ControlManager");
+                //default death penalty value
+                GameObject gameObject = new GameObject("DontDestroy");
                 DontDestroyOnLoad(gameObject);
                 gameObject.AddComponent<ControlManager>();
+                gameObject.AddComponent<BroadcastingComponent>();
 
 
                 LC_API.ServerAPI.ModdedServer.SetServerModdedOnly();
@@ -45,6 +47,7 @@ namespace LethalCompanyScalingMaster
         {
             return StartOfRound.Instance.connectedPlayersAmount + 1;
         }
+
         public static void OnPlayerJoin()
         {
             if (AutoUpdateQuota)
@@ -55,12 +58,10 @@ namespace LethalCompanyScalingMaster
 
         public static void SaveValues()
         {
-            Debug.Log("NON parsed values= " + GUIManager._baseQuota + " + "  + GUIManager._playerCountQuotaModifier + " X " + GetConnectedPlayers());
-
-            if (float.TryParse(GUIManager._baseQuota, out float baseQuotaParsed) && float.TryParse(GUIManager._playerCountQuotaModifier,
+            if (float.TryParse(GUIManager._baseQuota, out float baseQuotaParsed) && float.TryParse(
+                    GUIManager._playerCountQuotaModifier,
                     out float playerCountQuotaModifierParsed))
             {
-                Debug.Log("Parsed values= " + baseQuotaParsed + " + "  + playerCountQuotaModifierParsed + " X " + GetConnectedPlayers());
                 int startingQuota = (int)(baseQuotaParsed + (GetConnectedPlayers() * playerCountQuotaModifierParsed));
 
                 GUIManager._tod.quotaVariables.startingQuota = startingQuota;
@@ -69,7 +70,7 @@ namespace LethalCompanyScalingMaster
 
             if (float.TryParse(GUIManager._baseIncreaseInput, out float baseIncrease))
             {
-                GUIManager. _tod.quotaVariables.baseIncrease = baseIncrease;
+                GUIManager._tod.quotaVariables.baseIncrease = baseIncrease;
             }
 
             if (int.TryParse(GUIManager._daysUntilDeadlineInput, out int daysUntilDeadline))
@@ -80,7 +81,11 @@ namespace LethalCompanyScalingMaster
 
             GUIManager._tod.quotaVariables.increaseSteepness = GUIManager._quotaIncreaseSteepness;
             // Plugin.DeathPenalty = _tempDeathPenalty;
-            groupCredits= GUIManager._totalStartingCredits;
+            groupCredits = GUIManager._totalStartingCredits;
+
+            DeathPenalty = GUIManager._deathPenalty;
+
+            BroadcastingComponent.BroadcastDeathPenalty();
             UpdateAndSyncValues();
         }
 
