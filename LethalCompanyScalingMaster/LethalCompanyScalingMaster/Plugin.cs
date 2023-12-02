@@ -27,7 +27,17 @@ namespace LethalCompanyScalingMaster
             Logger.LogInfo($"Plugin {PluginInfo.PLUGIN_GUID} has loaded!");
         }
 
+        private void Start()
+        {
+            Initialize();
+        }
+
         private void OnDestroy()
+        {
+            Initialize();
+        }
+
+        private void Initialize()
         {
             if (!_loaded)
             {
