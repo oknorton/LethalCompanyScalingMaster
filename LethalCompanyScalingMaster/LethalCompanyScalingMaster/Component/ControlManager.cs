@@ -20,16 +20,15 @@ public class ControlManager : MonoBehaviour
 
     public void Update()
     {
-        if (!isInitialized)
+        if (!isInitialized && StartOfRound.Instance != null && (Plugin.GetConnectedPlayers() == 1) &&
+            StartOfRound.Instance.fullyLoadedPlayers.Count > 0)
         {
-            if (!isInitialized && StartOfRound.Instance != null && (Plugin.GetConnectedPlayers() == 1) &&
-                StartOfRound.Instance.fullyLoadedPlayers.Count > 0)
-            {
-                Debug.Log("Fully loaded players count: " + StartOfRound.Instance.fullyLoadedPlayers.Count);
-                Invoke("InitializeFunctions", 2f); 
-                isInitialized = true;
-            }
-           
+            Debug.Log("Fully loaded players count: " + StartOfRound.Instance.fullyLoadedPlayers.Count);
+            Invoke("InitializeFunctions", 2f);
+            isInitialized = true;
+
+            Plugin.Host = RoundManager.Instance.NetworkManager.IsHost;
+            Debug.Log("Plugin host has been set to: " + RoundManager.Instance.NetworkManager.IsHost);
         }
         
         if (Keyboard.current.ctrlKey.isPressed && Keyboard.current.mKey.wasPressedThisFrame && Plugin.Host)
